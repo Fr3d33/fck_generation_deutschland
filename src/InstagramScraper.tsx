@@ -7,37 +7,50 @@ interface ScrapedUsername {
 }
 
 export default function InstagramScraper() {
-  const [url, setUrl] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [usernames, setUsernames] = useState<ScrapedUsername[]>([]);
   const [error, setError] = useState('');
 
   const scrapeUsernames = async () => {
-    if (!url.trim()) {
-      setError('Please enter a valid URL');
-      return;
-    }
-
     setLoading(true);
     setError('');
 
     try {
-      // Mock scraping function - in a real application, this would call a backend API
-      // that uses Instagram's API or web scraping techniques
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Simulate scraped usernames
-      const mockUsernames: ScrapedUsername[] = [
-        { id: '1', username: 'user_' + Math.floor(Math.random() * 1000), scrapedAt: new Date().toISOString() },
-        { id: '2', username: 'insta_' + Math.floor(Math.random() * 1000), scrapedAt: new Date().toISOString() },
-        { id: '3', username: 'account_' + Math.floor(Math.random() * 1000), scrapedAt: new Date().toISOString() },
-        { id: '4', username: 'profile_' + Math.floor(Math.random() * 1000), scrapedAt: new Date().toISOString() },
-      ];
+      // Backend API aufrufen, um Instagram zu scrapen (Hashtag oder Trending)
+      const response = await fetch('http://localhost:3001/api/scrape', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          searchTerm: searchTerm.trim() || undefined 
+        }),
+      });
 
-      setUsernames(prev => [...mockUsernames, ...prev]);
-      setUrl('');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to scrape usernames');
+      }
+
+      const data = await response.json();
+      
+      // Konvertiere die gescrapten Usernames in das erwartete Format
+      const scrapedUsernames: ScrapedUsername[] = data.usernames.map((item: { username: string }, index: number) => ({
+        id: `${Date.now()}_${index}`,
+        username: item.username,
+        scrapedAt: new Date().toISOString(),
+      }));
+
+      if (scrapedUsernames.length === 0) {
+        setError('No usernames found. Try again or use a different search term.');
+      } else {
+        setUsernames(prev => [...scrapedUsernames, ...prev]);
+        setSearchTerm('');
+      }
     } catch (err) {
-      setError('Failed to scrape usernames. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to scrape usernames. Please try again.';
+      setError(errorMessage);
       console.error(err);
     } finally {
       setLoading(false);
@@ -65,18 +78,21 @@ export default function InstagramScraper() {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <div className="flex flex-col gap-4">
             <div>
-              <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
-                Instagram URL
+              <label htmlFor="searchTerm" className="block text-sm font-medium text-gray-700 mb-2">
+                Suchbegriff (z.B. "generation_deutschland")
               </label>
               <input
-                id="url"
+                id="searchTerm"
                 type="text"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://www.instagram.com/..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="generation_deutschland"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition"
                 disabled={loading}
               />
+              <p className="mt-1 text-xs text-gray-500">
+                Tipp: Gib einen Suchbegriff ein, um Accounts mit diesem Namen zu finden
+              </p>
             </div>
             
             {error && (
@@ -165,9 +181,9 @@ export default function InstagramScraper() {
         {/* Info Note */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-800">
-            <strong>Note:</strong> This is a demo application with simulated scraping functionality. 
-            In a production environment, you would need to implement a backend API that properly 
-            handles Instagram's terms of service and rate limiting.
+            <strong>Hinweis:</strong> Gib einen Suchbegriff ein (z.B. "generation_deutschland"), 
+            um alle Instagram-Accounts zu finden, die diesen Begriff im Namen haben. 
+            Das Scraping kann einige Sekunden dauern.
           </p>
         </div>
       </div>

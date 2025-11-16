@@ -1,143 +1,203 @@
 # Instagram Username Scraper
 
-A modern web application built with Vite, React, TypeScript, and Tailwind CSS for scraping Instagram usernames.
+Ein vollwertiger Instagram Username Scraper mit React Frontend und Express/Puppeteer Backend.
 
 ![Instagram Scraper Demo](https://github.com/user-attachments/assets/1def5699-b623-489f-ad6f-ce841de04d94)
 
 ## 🚀 Features
 
-- **Modern Tech Stack**: Built with Vite + React + TypeScript + Tailwind CSS
-- **Instagram Username Scraper**: Simulated scraping functionality with a clean UI
-- **Real-time Results**: Display scraped usernames instantly with timestamps
-- **Responsive Design**: Beautiful gradient design that works on all devices
-- **Fast Development**: Hot Module Replacement (HMR) for instant feedback
-- **Type-Safe**: Full TypeScript support for better code quality
+- **Echtes Instagram Scraping**: Verwendet Puppeteer, um tatsächlich Usernames von Instagram zu scrapen
+- **Modern Tech Stack**: Vite + React + TypeScript + Tailwind CSS (Frontend) + Express + Puppeteer (Backend)
+- **Real-time Results**: Zeigt gescrapte Usernames sofort mit Zeitstempeln an
+- **Responsive Design**: Schönes Gradient-Design für alle Geräte
+- **Fast Development**: Hot Module Replacement (HMR) für sofortiges Feedback
+- **Type-Safe**: Vollständige TypeScript-Unterstützung
 
-## 📋 Prerequisites
+## 📋 Voraussetzungen
 
-- Node.js (v18 or higher recommended)
-- npm or yarn package manager
+- Node.js (v18 oder höher empfohlen)
+- npm oder yarn Package Manager
+- Bun (optional, für schnellere Installation)
 
 ## 🛠️ Installation
 
-1. Clone the repository:
+1. Repository klonen:
 ```bash
 git clone https://github.com/Fr3d33/fck_generation_deutschland.git
 cd fck_generation_deutschland
 ```
 
-2. Install dependencies:
+2. Dependencies installieren:
 ```bash
 npm install
+# oder mit bun
+bun install
 ```
 
-## 🏃 Running the Application
+## 🏃 Anwendung starten
 
-### Development Mode
+### Development Mode (Frontend + Backend gleichzeitig)
 
-Start the development server with hot-reload:
+Starte sowohl Frontend als auch Backend mit einem Befehl:
 
+```bash
+npm run dev:all
+```
+
+Dies startet:
+- Frontend auf `http://localhost:5173/`
+- Backend API auf `http://localhost:3001/`
+
+### Einzeln starten
+
+**Nur Frontend:**
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173/`
+**Nur Backend:**
+```bash
+npm run dev:server
+```
 
 ### Production Build
 
-Build the application for production:
-
+Frontend für Production bauen:
 ```bash
 npm run build
 ```
 
-Preview the production build:
-
+Backend für Production bauen:
 ```bash
-npm run preview
+npm run build:server
+```
+
+Production Server starten:
+```bash
+npm run start:server
 ```
 
 ## 🎨 Technology Stack
 
-- **Vite**: Next-generation frontend tooling
-- **React 18**: UI library with hooks
-- **TypeScript**: Type-safe JavaScript
-- **Tailwind CSS**: Utility-first CSS framework
-- **PostCSS**: CSS transformations
-- **ESLint**: Code linting and quality
+### Frontend
+- **Vite**: Next-Generation Frontend Tooling
+- **React 19**: UI Library mit Hooks
+- **TypeScript**: Type-sicheres JavaScript
+- **Tailwind CSS**: Utility-First CSS Framework
 
-## 📁 Project Structure
+### Backend
+- **Express**: Node.js Web Framework
+- **Puppeteer**: Headless Chrome für Web Scraping
+- **TypeScript**: Type-sicheres Backend
+- **CORS**: Cross-Origin Resource Sharing
+
+## 📁 Projektstruktur
 
 ```
 fck_generation_deutschland/
-├── src/
-│   ├── App.tsx              # Main application component
-│   ├── InstagramScraper.tsx # Instagram scraper component
-│   ├── main.tsx            # Application entry point
-│   └── index.css           # Tailwind CSS imports
-├── public/                 # Static assets
-├── index.html             # HTML template
-├── package.json           # Project dependencies
-├── tsconfig.json          # TypeScript configuration
-├── tailwind.config.js     # Tailwind CSS configuration
-├── postcss.config.js      # PostCSS configuration
-└── vite.config.ts         # Vite configuration
+├── src/                    # Frontend Source
+│   ├── App.tsx            # Main Application
+│   ├── InstagramScraper.tsx  # Scraper Component
+│   ├── main.tsx           # Entry Point
+│   └── index.css          # Styles
+├── server/                # Backend Source
+│   ├── index.ts          # Express Server & Scraping Logic
+│   └── tsconfig.json     # TypeScript Config für Backend
+├── public/               # Static Assets
+├── package.json          # Dependencies & Scripts
+└── vite.config.ts        # Vite Configuration
 ```
 
-## 🔧 Development
+## 🔧 Verwendung
 
-### Code Quality
+1. Starte die Anwendung mit `npm run dev:all`
+2. Öffne `http://localhost:5173/` im Browser
+3. Gib eine Instagram-URL ein (z.B. Link zu einem Post)
+4. Klicke auf "Scrape Usernames"
+5. Die gescrapten Usernames werden in der Liste angezeigt
+6. Klicke auf das externe Link-Icon, um Instagram-Profile zu besuchen
 
-Run ESLint to check for code issues:
+## 📝 API Endpoints
 
+### POST `/api/scrape`
+
+Scrapt Usernames von einer Instagram-URL.
+
+**Request Body:**
+```json
+{
+  "url": "https://www.instagram.com/p/XXXXXX/"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "usernames": [
+    {
+      "username": "example_user",
+      "profileUrl": "https://www.instagram.com/example_user"
+    }
+  ],
+  "count": 1
+}
+```
+
+### GET `/health`
+
+Health Check Endpoint.
+
+**Response:**
+```json
+{
+  "status": "ok",
+  "message": "Instagram Scraper API is running"
+}
+```
+
+## ⚠️ Wichtige Hinweise
+
+- **Rate Limiting**: Instagram kann deine IP blockieren, wenn zu viele Requests gemacht werden
+- **Terms of Service**: Stelle sicher, dass du Instagrams ToS respektierst
+- **Headless Browser**: Puppeteer lädt Chrome herunter (~170-280MB beim ersten Mal)
+- **Login erforderlich**: Manche Instagram-Inhalte erfordern Login (aktuell nicht implementiert)
+
+## 🛡️ Troubleshooting
+
+### Puppeteer Installation Probleme
+
+Falls Puppeteer Probleme macht:
 ```bash
-npm run lint
+# Chrome manuell herunterladen
+npx puppeteer browsers install chrome
 ```
 
-### Building for Production
+### CORS Fehler
 
-The build process compiles TypeScript, bundles assets, and optimizes for production:
+Stelle sicher, dass das Backend auf Port 3001 läuft und CORS aktiviert ist.
 
-```bash
-npm run build
-```
+### Keine Usernames gefunden
 
-Output will be in the `dist/` directory.
-
-## 📝 Usage
-
-1. Open the application in your browser
-2. Enter an Instagram URL in the input field
-3. Click "Scrape Usernames" to start the scraping process
-4. View the scraped usernames in the results section
-5. Click on the external link icon to visit Instagram profiles
-6. Use the "Clear" button to remove all results
-
-## ⚠️ Important Note
-
-This is a **demo application** with simulated scraping functionality. In a production environment, you would need to:
-
-- Implement a backend API for actual Instagram scraping
-- Handle Instagram's terms of service and rate limiting
-- Use proper authentication and authorization
-- Implement error handling and retry logic
-- Consider using Instagram's official API when available
+- Versuche eine andere Instagram-URL (Posts mit Kommentaren funktionieren am besten)
+- Manche Posts sind privat oder erfordern Login
+- Instagram könnte Anti-Scraping Maßnahmen aktiviert haben
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions sind willkommen! Bitte erstelle einen Pull Request.
 
-## 📄 License
+## 📄 Lizenz
 
-This project is open source and available under the MIT License.
+MIT License - siehe LICENSE Datei.
 
 ## 🔗 Links
 
-- [Vite Documentation](https://vitejs.dev/)
-- [React Documentation](https://react.dev/)
-- [TypeScript Documentation](https://www.typescriptlang.org/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/)
+- [Vite Dokumentation](https://vitejs.dev/)
+- [React Dokumentation](https://react.dev/)
+- [Puppeteer Dokumentation](https://pptr.dev/)
+- [Express Dokumentation](https://expressjs.com/)
 
 ---
 
-Built with ❤️ using Vite + React + TypeScript + Tailwind CSS
+Gebaut mit ❤️ von Fr3d33
